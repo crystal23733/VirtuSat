@@ -21,30 +21,22 @@ VirtuSat은 실제 인공위성 통신처럼
 
 ```plaintext
 VirtuSat/
-├── include/              # 공통 헤더 파일 (.h)
-│   ├── common.h          # 공통 정의 (구조체, 상수 등)
-│   └── protocol.h        # 메시지 포맷 정의
+├── include/              # 헤더 파일 (.h)
+│   ├── common.h
+│   ├── protocol.h
+│   └── config.h
 │
-├── src/                  # 소스 코드
-│   ├── main_satellite.c  # 위성 프로그램 진입점
-│   ├── main_ground.c     # 지상국 프로그램 진입점
-│   ├── network.c         # TCP 통신 함수
-│   ├── sensor.c          # 센서값 시뮬레이션
-│   └── command.c         # 명령 처리 모듈
+├── src/                  # 소스코드 (.c)
+│   ├── main_satellite.c
+│   ├── main_ground.c
+│   ├── network.c
+│   ├── sensor.c
+│   └── command.c
 │
-├── build/                # 빌드 결과 바이너리 저장
-│   ├── satellite         # 위성 실행 파일
-│   └── ground            # 지상국 실행 파일
-│
-├── data/                 # 로그나 CSV 저장
-│   └── ground_log.csv
-│
-├── diagrams/             # 설계도 (flowchart, sequence)
-│   └── architecture.png
-│
-├── README.md             # 프로젝트 설명
-├── Makefile              # 빌드 자동화
-└── config.h              # 컴파일 옵션, 설정값
+├── build/                # 바이너리 저장(컴파일 결과)
+├── data/                 # 로그, CSV 등 데이터 저장
+├── README.md             # 프로젝트 설명문
+└── Makefile              # 빌드 자동화 (모든 OS 지원)
 
 ````
 
