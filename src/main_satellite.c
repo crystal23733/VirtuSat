@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include <string.h>
 #include "sensor.h"
 #include "network.h"
 #include "protocol.h"
@@ -17,24 +18,35 @@ int main() {
     // [2] 지상국 연결 기다리기
     int client_fd = accept_connection(server_fd);
 
-    // [3] 1회용 수신 테스트
     char buffer[BUFFER_SIZE];
-    int received = receive_message(client_fd, buffer, BUFFER_SIZE);
-
-    if (received > 0) {
-        printf("[위성] 받은 명령: %s\n", buffer);
-    } else {
-        printf("[위성] 수신 실패\n");
-    }
 
     while(1) {
+        int received = receive_message(client_fd, buffer, BUFFER_SIZE);
+        if (received <= 0) {
+            printf("[위성] 수신 실패 또는 연결 종료\n");
+            break;
+        }
+
+        CommandType cmd = parse_command(buffer);
+
         // 센서 값 생성
         SensorData data = generate_sensor_data();
 
-        // 데이터 출력
-        printf("[센서] 온도: %.1f도 | 전압: %.2fV\n", data.temperature, data.voltage);
+        char response[BUFFER_SIZE];
+        if (cmd == CMD_TEMP) {
+            sprintf(response, "TEMP:%.1f", data.temperature);
+        } else if (cmd == CMD_VOLT) {
+            sprintf(response, "VOLT:%.2f", data.voltage);
+        } else if (cmd == CMD_STAT) {
+            sprintf(response, "STAT:TEMP=%.1f;VOLT=%.2f", data.temperature, data.voltage);
+        } else if (cmd == CMD_PING) {
+            strcpy(response, "ACK:PING_OK");
+        } else {
+            strcpy(response, "ERR:UNKNOWN_CMD");
+        }
 
-        sleep(1);
+        send_message(client_fd, response);
+        printf("[위성] -> 응답 전송: %s\n", response);
     }
 
     return 0;
