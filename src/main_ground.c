@@ -12,6 +12,14 @@ int main() {
     // 위성과 연결 시도
     int sock = connect_to_server();
 
+    // 로그 파일 열기
+    FILE *log_file = fopen("data/ground_log.csv", "w");
+    if (!log_file) {
+        printf("[지상국] 로그 파일 열기 실패\n");
+        return 1;
+    }
+    fprintf(log_file, "type,value\n");
+
     while(1) {
         // 명령어 입력
         printf(">> 명령 입력 (TEMP. VOLT, STAT, PING): ");
@@ -42,7 +50,24 @@ int main() {
         // 응답 출력
         printf("[응답] %s\n", response);
 
+        float temp, volt;
+
+        if (strstr(response, "VOLT")) {
+            sscanf(response, "TEMP:%f", &temp);
+            fprintf(log_file, "TEMP, %.2f\n", temp);
+        } else if (strstr(response, "VOLT:")) {
+            sscanf(response, "VOLT:%f", &volt);
+            fprintf(log_file, "VOLT, %.2f\n", volt);
+        } else if (strstr(response, "STAT:")) {
+            sscanf(response, "STAT:TEMP=%f;VOLT%f", &temp, &volt);
+            fprintf(log_file, "TEMP,%.2f\n", temp);
+            fprintf(log_file, "VOLT,%.2f\n", volt);
+        }
+
+        fflush(log_file); // 즉시 파일에 기록
     }
+
+    fclose(log_file);
 
     return 0;
 }
