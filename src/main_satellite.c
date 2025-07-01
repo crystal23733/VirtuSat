@@ -12,10 +12,10 @@ int main() {
 
     printf("위성 작동 시작...\n");
 
-    // [1] 서버 시작
+    // 서버 시작
     int server_fd = start_server();
 
-    // [2] 지상국 연결 기다리기
+    // 지상국 연결 기다리기
     int client_fd = accept_connection(server_fd);
 
     char buffer[BUFFER_SIZE];
