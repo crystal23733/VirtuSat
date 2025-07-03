@@ -1,11 +1,26 @@
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
+#include <stdlib.h>
 #include "network.h"
 #include "protocol.h"
+
+FILE *log_file = NULL;
+
+// 종료 시 안전하게 파일을 닫는 함수
+void cleanup(int sig) {
+    if (log_file) {
+        fclose(log_file);
+    }
+    printf("\n[지상국] 안전 종료 완료.\n");
+    exit(0);
+}
 
 int main() {
     char input[BUFFER_SIZE];
     char response[BUFFER_SIZE];
+
+    signal(SIGINT, cleanup);
 
     printf("VirtuSat 지상국 작동 시작...\n");
 
@@ -13,7 +28,7 @@ int main() {
     int sock = connect_to_server();
 
     // 로그 파일 열기
-    FILE *log_file = fopen("data/ground_log.csv", "w");
+    log_file = fopen("data/ground_log.csv", "w");
     if (!log_file) {
         printf("[지상국] 로그 파일 열기 실패\n");
         return 1;
@@ -50,7 +65,7 @@ int main() {
         // 응답 출력
         printf("[응답] %s\n", response);
 
-        float temp, volt;
+        float temp = 0, volt = 0;
 
         if (strstr(response, "VOLT")) {
             sscanf(response, "TEMP:%f", &temp);
@@ -64,10 +79,12 @@ int main() {
             fprintf(log_file, "VOLT,%.2f\n", volt);
         }
 
+        if (temp >= 70.0) {
+            printf("[경고] 온도가 70도를 초과했습니다! 현재: %.2f\n", temp);
+        }
+
         fflush(log_file); // 즉시 파일에 기록
     }
-
-    fclose(log_file);
 
     return 0;
 }
