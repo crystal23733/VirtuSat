@@ -11,6 +11,8 @@ CommandType parse_command(const char* message) {
         return CMD_STAT;
     } else if (strncmp(message, "PING", 4) == 0) {
         return CMD_PING;
+    } else if (strncmp(message, "RESET", 6) == 0) {
+        return CMD_RESET;
     } else {
         return CMD_UNKNOWN;
     }
