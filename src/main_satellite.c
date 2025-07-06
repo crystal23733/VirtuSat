@@ -3,6 +3,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdbool.h>
 #include "sensor.h"
 #include "network.h"
 #include "protocol.h"
@@ -18,6 +19,8 @@ int main() {
     // 지상국 연결 기다리기
     int client_fd = accept_connection(server_fd);
 
+    bool safe_mode = false;
+
     char buffer[BUFFER_SIZE];
 
     while(1) {
@@ -27,22 +30,34 @@ int main() {
             break;
         }
 
+        printf("[위성] 받은 명령: %s\n", buffer);
+
         CommandType cmd = parse_command(buffer);
 
         // 센서 값 생성
         SensorData data = generate_sensor_data();
 
+        // 안전모드 진입 조건
+        if (data.temperature >= 85.0) {
+            safe_mode = true;
+            printf("[위성] SAFE MODE 진입: 온도=%.1f\n", data.temperature);
+        }
+
         char response[BUFFER_SIZE];
-        if (cmd == CMD_TEMP) {
-            sprintf(response, "TEMP:%.1f", data.temperature);
-        } else if (cmd == CMD_VOLT) {
-            sprintf(response, "VOLT:%.2f", data.voltage);
-        } else if (cmd == CMD_STAT) {
-            sprintf(response, "STAT:TEMP=%.1f;VOLT=%.2f", data.temperature, data.voltage);
-        } else if (cmd == CMD_PING) {
-            strcpy(response, "ACK:PING_OK");
+        if (safe_mode) {
+            strcpy(response, "SAFE:OVERHEAT");
         } else {
-            strcpy(response, "ERR:UNKNOWN_CMD");
+            if (cmd == CMD_TEMP) {
+                sprintf(response, "TEMP:%.1f", data.temperature);
+            } else if (cmd == CMD_VOLT) {
+                sprintf(response, "VOLT:%.2f", data.voltage);
+            } else if (cmd == CMD_STAT) {
+                sprintf(response, "STAT:TEMP=%.1f;VOLT=%.2f", data.temperature, data.voltage);
+            } else if (cmd == CMD_PING) {
+                strcpy(response, "ACK:PING_OK");
+            } else {
+                strcpy(response, "ERR:UNKNOWN_CMD");
+            }
         }
 
         send_message(client_fd, response);
