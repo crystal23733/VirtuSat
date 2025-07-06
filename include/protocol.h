@@ -8,6 +8,7 @@ typedef enum {
     CMD_VOLT,
     CMD_STAT,
     CMD_PING,
+    CMD_RESET,
     CMD_UNKNOWN
 } CommandType;
 
