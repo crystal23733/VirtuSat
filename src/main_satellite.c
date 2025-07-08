@@ -44,7 +44,10 @@ int main() {
         }
 
         char response[BUFFER_SIZE];
-        if (safe_mode) {
+        if (cmd == CMD_RESET) {
+            safe_mode = false;
+            strcpy(response, "ACK:RESET_OK");
+        } else if (safe_mode) {
             strcpy(response, "SAFE:OVERHEAT");
         } else {
             if (cmd == CMD_TEMP) {
