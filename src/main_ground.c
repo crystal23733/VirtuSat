@@ -43,6 +43,11 @@ int main() {
         // 문자열 끝 줄바꿈 제거
         input[strcspn(input, "\n")] = '\0';
 
+        if (strcmp(input, "EXIT") == 0) {
+            printf("[지상국] EXIT 명령으로 종료합니다.\n");
+            break;
+        }
+
         // 명령어 유효성 검사
         CommandType cmd = parse_command(input);
         if (cmd == CMD_UNKNOWN) {
@@ -86,5 +91,6 @@ int main() {
         fflush(log_file); // 즉시 파일에 기록
     }
 
+    cleanup(0);
     return 0;
 }
