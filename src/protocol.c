@@ -15,6 +15,8 @@ CommandType parse_command(const char* message) {
         return CMD_RESET;
     } else if (strncmp(message, "EXIT", 4) == 0) {
         return CMD_EXIT;
+    } else if (strncmp(message, "CALIBRATE", 10) == 0) {
+        return CMD_CALIBRATE;
     } else {
         return CMD_UNKNOWN;
     }
