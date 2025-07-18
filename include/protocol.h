@@ -10,7 +10,8 @@ typedef enum {
     CMD_PING,
     CMD_RESET,
     CMD_UNKNOWN,
-    CMD_EXIT
+    CMD_EXIT,
+    CMD_CALIBRATE
 } CommandType;
 
 typedef  struct {
